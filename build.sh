@@ -43,9 +43,11 @@ fi
 
 # set up paths of cc and cxx compiler
 if [ "$1" == "gcc" ]; then
+    echo "Building using g++/gcc"
     export CC="gcc"
     export CXX="g++"
 else
+    echo "Building using Clang-5.0"
     if [ "$(uname)" == "Darwin" ]; then
         CMAKE="$(greadlink -f cmake_build/bin/cmake)"
 
@@ -82,7 +84,7 @@ if [[ ! -d $build_dir ]]; then
     mkdir -p $build_dir
     pushd $build_dir  >/dev/null
 
-    "$CMAKE" ../cmake -DCMAKE_BUILD_TYPE=Debug \
+    "$CMAKE" ../cmake -DCMAKE_BUILD_TYPE=debug \
         || (popd && rm -r $build_dir && exit 1)
     popd >/dev/null
 fi
