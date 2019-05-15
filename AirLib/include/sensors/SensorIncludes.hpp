@@ -1,0 +1,6 @@
+#include "barometer/BarometerBase.hpp"
+#include "distance/DistanceBase.hpp"
+#include "gps/GpsBase.hpp"
+#include "imu/ImuBase.hpp"
+#include "lidar/LidarBase.hpp"
+#include "magnetometer/MagnetometerBase.hpp"

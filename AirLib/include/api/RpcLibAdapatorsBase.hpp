@@ -11,6 +11,7 @@
 #include "common/ImageCaptureBase.hpp"
 #include "safety/SafetyEval.hpp"
 #include "api/WorldSimApiBase.hpp"
+#include "sensors/SensorIncludes.hpp"
 
 #include "common/common_utils/WindowsApisCommonPre.hpp"
 #include "rpc/msgpack.hpp"
