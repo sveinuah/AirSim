@@ -188,10 +188,10 @@ void UManualPoseController::inputManualDownPitch(float val)
 void UManualPoseController::inputManualLeftRoll(float val)
 {
     if (!FMath::IsNearlyEqual(val, 0.f))
-        delta_rotation_.Add(0, 0, -val * movement_speed_ * 2);
+        delta_rotation_.Add(0, 0, -val * movement_speed_ * 10);
 }
 void UManualPoseController::inputManualRightRoll(float val)
 {
     if (!FMath::IsNearlyEqual(val, 0.f))
-        delta_rotation_.Add(0, 0, val * movement_speed_ * 2);
+        delta_rotation_.Add(0, 0, val * movement_speed_ * 10);
 }
