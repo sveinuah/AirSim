@@ -30,6 +30,8 @@ private:
     void inputManualUpPitch(float val);
     void inputManualRightYaw(float val);
     void inputManualDownPitch(float val);
+    void inputManualLeftRoll(float val);
+    void inputManualRightRoll(float val);
 
     void setupInputBindings();  
     void removeInputBindings();
@@ -38,11 +40,11 @@ private:
 private:
     FInputAxisBinding *left_binding_, *right_binding_, *up_binding_, *down_binding_;
     FInputAxisBinding *forward_binding_, *backward_binding_;//, *left_yaw_binding_, *up_pitch_binding_;
-    FInputAxisBinding *right_yaw_binding_, *down_pitch_binding_;
+    FInputAxisBinding *right_yaw_binding_, *down_pitch_binding_, *left_roll_binding_, *right_roll_binding_;
 
     FInputAxisKeyMapping left_mapping_, right_mapping_, up_mapping_, down_mapping_;
     FInputAxisKeyMapping forward_mapping_, backward_mapping_;//, left_yaw_mapping_, up_pitch_mapping_;
-    FInputAxisKeyMapping right_yaw_mapping_, down_pitch_mapping_;
+    FInputAxisKeyMapping right_yaw_mapping_, down_pitch_mapping_, left_roll_mapping_, right_roll_mapping_;
 
 
     FVector delta_position_;
@@ -53,4 +55,6 @@ private:
     float acceleration_ = 0;
     FVector input_positive_, inpute_negative_;
     FVector last_velocity_;
+
+    float movement_speed_ = 0.1;
 };

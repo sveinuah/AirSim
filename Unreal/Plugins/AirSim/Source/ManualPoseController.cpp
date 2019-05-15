@@ -15,10 +15,12 @@ void UManualPoseController::initializeForPlay()
 
     left_mapping_ = FInputAxisKeyMapping("inputManualArrowLeft", EKeys::A); right_mapping_ = FInputAxisKeyMapping("inputManualArrowRight", EKeys::D);
     forward_mapping_= FInputAxisKeyMapping("inputManualForward", EKeys::W); backward_mapping_ = FInputAxisKeyMapping("inputManualBackward", EKeys::S);
-    up_mapping_ = FInputAxisKeyMapping("inputManualArrowUp", EKeys::E); down_mapping_ = FInputAxisKeyMapping("inputManualArrowDown", EKeys::Q);
+    up_mapping_ = FInputAxisKeyMapping("inputManualArrowUp", EKeys::SpaceBar); down_mapping_ = FInputAxisKeyMapping("inputManualArrowDown", EKeys::X);
     right_yaw_mapping_ = FInputAxisKeyMapping("inputManualRightYaw", EKeys::MouseX); down_pitch_mapping_ = FInputAxisKeyMapping("inputManualDownPitch", EKeys::MouseY);
+    left_roll_mapping_ = FInputAxisKeyMapping("inputManualLeftRoll", EKeys::Q); right_roll_mapping_ = FInputAxisKeyMapping("inputManualRightRoll", EKeys::E);
 
     input_positive_ = inpute_negative_ = last_velocity_ = FVector::ZeroVector;
+    movement_speed_ = 0.1;
 }
 
 void UManualPoseController::clearBindings()
@@ -26,6 +28,7 @@ void UManualPoseController::clearBindings()
     left_binding_ = right_binding_ = up_binding_ = down_binding_ = nullptr;
     forward_binding_ = backward_binding_ = nullptr;// left_yaw_binding_ = up_pitch_binding_ = nullptr;
     right_yaw_binding_ = down_pitch_binding_ = nullptr;
+    left_roll_binding_ = right_roll_binding_ = nullptr;
 }
 
 void UManualPoseController::setActor(AActor* actor)
@@ -97,6 +100,10 @@ void UManualPoseController::removeInputBindings()
         UAirBlueprintLib::RemoveAxisBinding(right_yaw_mapping_, right_yaw_binding_, actor_);
     if (down_pitch_binding_)
         UAirBlueprintLib::RemoveAxisBinding(down_pitch_mapping_, down_pitch_binding_, actor_);
+    if (left_roll_binding_)
+        UAirBlueprintLib::RemoveAxisBinding(left_roll_mapping_, left_roll_binding_, actor_);
+    if (right_roll_binding_)
+        UAirBlueprintLib::RemoveAxisBinding(right_roll_mapping_, right_roll_binding_, actor_);
 
     clearBindings();
 }
@@ -115,6 +122,8 @@ void UManualPoseController::setupInputBindings()
     //up_pitch_binding_ = & UAirBlueprintLib::BindAxisToKey(up_pitch_mapping_, actor_, this, &UManualPoseController::inputManualUpPitch);
     right_yaw_binding_ = & UAirBlueprintLib::BindAxisToKey(right_yaw_mapping_, actor_, this, &UManualPoseController::inputManualRightYaw);
     down_pitch_binding_ = & UAirBlueprintLib::BindAxisToKey(down_pitch_mapping_, actor_, this, &UManualPoseController::inputManualDownPitch);
+    left_roll_binding_ = & UAirBlueprintLib::BindAxisToKey(left_roll_mapping_, actor_, this, &UManualPoseController::inputManualLeftRoll);
+    right_roll_binding_ = & UAirBlueprintLib::BindAxisToKey(right_roll_mapping_, actor_, this, &UManualPoseController::inputManualRightRoll);
 }
 
 void UManualPoseController::updateDeltaPosition(float dt)
@@ -133,27 +142,27 @@ void UManualPoseController::updateDeltaPosition(float dt)
 
 void UManualPoseController::inputManualLeft(float val)
 {
-    inpute_negative_.Y = val;
+    inpute_negative_.Y = movement_speed_*val;
 }
 void UManualPoseController::inputManualRight(float val)
 {
-    input_positive_.Y = val;
+    input_positive_.Y = movement_speed_*val;
 }
 void UManualPoseController::inputManualForward(float val)
 {
-    input_positive_.X = val;
+    input_positive_.X = movement_speed_*val;
 }
 void UManualPoseController::inputManualBackward(float val)
 {
-    inpute_negative_.X = val;
+    inpute_negative_.X = movement_speed_*val;
 }
 void UManualPoseController::inputManualMoveUp(float val)
 {
-    input_positive_.Z = val;
+    input_positive_.Z = movement_speed_*val;
 }
 void UManualPoseController::inputManualDown(float val)
 {
-    inpute_negative_.Z = val;
+    inpute_negative_.Z = movement_speed_*val;
 }
 void UManualPoseController::inputManualLeftYaw(float val)
 {
@@ -174,4 +183,15 @@ void UManualPoseController::inputManualDownPitch(float val)
 {
     if (!FMath::IsNearlyEqual(val, 0.f))
         delta_rotation_.Add(val, 0, 0);
+}
+
+void UManualPoseController::inputManualLeftRoll(float val)
+{
+    if (!FMath::IsNearlyEqual(val, 0.f))
+        delta_rotation_.Add(0, 0, -val * movement_speed_ * 2);
+}
+void UManualPoseController::inputManualRightRoll(float val)
+{
+    if (!FMath::IsNearlyEqual(val, 0.f))
+        delta_rotation_.Add(0, 0, val * movement_speed_ * 2);
 }
