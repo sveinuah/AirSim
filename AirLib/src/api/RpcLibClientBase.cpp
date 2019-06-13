@@ -120,14 +120,24 @@ void RpcLibClientBase::confirmConnection()
     //command_context.client.ping();
     //std::cout << "DroneServer is responding." << std::endl;
 
+
     std::cout << "Waiting for connection - " << std::flush;
     const TTimeDelta pause_time = 1;
+    const TTimePoint start_time = clock->nowNanos();
     while (getConnectionState() != RpcLibClientBase::ConnectionState::Connected)
     {
         std::cout << "X" << std::flush;
         clock->sleep_for(pause_time); 
+
+        if (clock->nowNanos() - start_time > 10) {
+            std::cerr << "\nCould not connect to server" << std::endl;
+            break;
+        }
     }
-    std::cout << std::endl << "Connected!" << std::endl;
+    if (getConnectionState() == RpcLibClientBase::ConnectionState::Connected)
+    {
+        std::cout << std::endl << "Connected!" << std::endl;
+    }
 
     auto server_ver = getServerVersion();
     auto client_ver = getClientVersion();
