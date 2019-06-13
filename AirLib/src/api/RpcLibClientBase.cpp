@@ -129,7 +129,7 @@ void RpcLibClientBase::confirmConnection()
         std::cout << "X" << std::flush;
         clock->sleep_for(pause_time); 
 
-        if (clock->nowNanos() - start_time > 10) {
+        if ((clock->nowNanos() - start_time) > 10E9) {
             std::cerr << "\nCould not connect to server" << std::endl;
             break;
         }
@@ -137,26 +137,27 @@ void RpcLibClientBase::confirmConnection()
     if (getConnectionState() == RpcLibClientBase::ConnectionState::Connected)
     {
         std::cout << std::endl << "Connected!" << std::endl;
+        
+        auto server_ver = getServerVersion();
+        auto client_ver = getClientVersion();
+        auto server_min_ver = getMinRequiredServerVersion();
+        auto client_min_ver = getMinRequiredClientVersion();
+        
+        std::string ver_info = Utils::stringf("Client Ver:%i (Min Req:%i), Server Ver:%i (Min Req:%i)",
+            client_ver, client_min_ver, server_ver, server_min_ver);
+
+        if (server_ver < server_min_ver) {
+            std::cerr << std::endl << ver_info << std::endl;
+            std::cerr << std::endl << "AirSim server is of older version and not supported by this client. Please upgrade!" << std::endl;
+        }
+        else if (client_ver < client_min_ver) {
+            std::cerr << std::endl << ver_info << std::endl;
+            std::cerr << std::endl << "AirSim client is of older version and not supported by this server. Please upgrade!" << std::endl;
+        }
+        else
+            std::cout << std::endl << ver_info << std::endl;
     }
 
-    auto server_ver = getServerVersion();
-    auto client_ver = getClientVersion();
-    auto server_min_ver = getMinRequiredServerVersion();
-    auto client_min_ver = getMinRequiredClientVersion();
-    
-    std::string ver_info = Utils::stringf("Client Ver:%i (Min Req:%i), Server Ver:%i (Min Req:%i)",
-        client_ver, client_min_ver, server_ver, server_min_ver);
-
-    if (server_ver < server_min_ver) {
-        std::cerr << std::endl << ver_info << std::endl;
-        std::cerr << std::endl << "AirSim server is of older version and not supported by this client. Please upgrade!" << std::endl;
-    }
-    else if (client_ver < client_min_ver) {
-        std::cerr << std::endl << ver_info << std::endl;
-        std::cerr << std::endl << "AirSim client is of older version and not supported by this server. Please upgrade!" << std::endl;
-    }
-    else
-        std::cout << std::endl << ver_info << std::endl;
 }
 
 bool RpcLibClientBase::armDisarm(bool arm, const std::string& vehicle_name)
