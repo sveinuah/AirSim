@@ -74,9 +74,10 @@ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::v
                 // The completion is called immeidately after GameThread sends the
                 // rendering commands to RenderThread. Hence, our ExecuteTask will
                 // execute *immediately* after RenderThread renders the scene!
-                ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(
-                    SceneDrawCompletion,
-                    RenderRequest *, This, this,
+
+                RenderRequest* This = this;
+                ENQUEUE_RENDER_COMMAND(SceneDrawCompletion)(
+                    [This](FRHICommandListImmediate& RHICmdList)
                     {
                         This->ExecuteTask();
                     }
@@ -110,12 +111,9 @@ void RenderRequest::getScreenshot(std::shared_ptr<RenderParams> params[], std::v
                 if (params[i]->compress)
                     UAirBlueprintLib::CompressImageArray(results[i]->width, results[i]->height, results[i]->bmp, results[i]->image_data_uint8);
                 else {
-                    uint8* ptr = results[i]->image_data_uint8.GetData();
+                    uint32* ptr = reinterpret_cast<uint32*>(results[i]->image_data_uint8.GetData());
                     for (const auto& item : results[i]->bmp) {
-                        *ptr++ = item.R;
-                        *ptr++ = item.G;
-                        *ptr++ = item.B;
-                        *ptr++ = item.A;
+                        *ptr++ = item.ToPackedABGR();
                     }
                 }
             }
@@ -145,8 +143,9 @@ void RenderRequest::ExecuteTask()
 {
     if (params_ != nullptr && req_size_ > 0)
     {
+        FRHICommandListImmediate& RHICmdList = GetImmediateCommandList_ForRenderCommand();
+
         for (unsigned int i = 0; i < req_size_; ++i) {
-            FRHICommandListImmediate& RHICmdList = GetImmediateCommandList_ForRenderCommand();
             auto rt_resource = params_[i]->render_target->GetRenderTargetResource();
             if (rt_resource != nullptr) {
                 const FTexture2DRHIRef& rhi_texture = rt_resource->GetRenderTargetTexture();
