@@ -35,6 +35,8 @@ void UnrealImageCapture::getSceneCaptureImage(const std::vector<msr::airlib::Ima
     std::vector<std::shared_ptr<RenderRequest::RenderParams>> render_params;
     std::vector<std::shared_ptr<RenderRequest::RenderResult>> render_results;
 
+    responses.reserve(requests.size());
+
     bool visibilityChanged = false;
     for (unsigned int i = 0; i < requests.size(); ++i) {
         APIPCamera* camera = cameras_->at(requests.at(i).camera_name);
